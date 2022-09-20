@@ -1,0 +1,5 @@
+name: PhoenixMapBingoAPI
+main: me.phoenixcantfly.phoenixmapbingoapi.Main
+version: 0.0.1
+description: makes maps for bingo
+api-version: 1.18

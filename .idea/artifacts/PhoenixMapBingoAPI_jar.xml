@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="PhoenixMapBingoAPI:jar">
+    <output-path>$PROJECT_DIR$/out</output-path>
+    <root id="archive" name="PhoenixMapBingoAPI.jar">
+      <element id="module-output" name="PhoenixMapBingoAPI" />
+    </root>
+  </artifact>
+</component>
