@@ -1,76 +1,74 @@
 package me.phoenixcantfly.phoenixmapbingoapi;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-import org.bukkit.map.*;
-
-import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
 import java.awt.image.PixelGrabber;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import org.bukkit.entity.Player;
+import org.bukkit.map.MapCanvas;
+import org.bukkit.map.MapPalette;
+import org.bukkit.map.MapRenderer;
+import org.bukkit.map.MapView;
+import org.bukkit.map.MinecraftFont;
 
 public class Renderer extends MapRenderer {
 
-    private List<BufferedImage> imagesToDraw = new ArrayList<BufferedImage>();
-    private List<String> textsToDraw = new ArrayList<String>();
+    public final Main plugin;
 
-    private List<BingoItem> bingoItemsToDraw = new ArrayList<BingoItem>();
-    @Override
+    boolean renderedGrid = false;
+
+    public Renderer(Main plugin) {
+        this.plugin = plugin;
+    }
+
     public void render(MapView mapView, MapCanvas mapCanvas, Player player) {
-        for (int x = 0; x < 128; x+= 121){
-            for (int y = 0; y < 128; y++) {
-                for (int i = 0; i < 7; i++){
-                    mapCanvas.setPixel(x+i, y, MapPalette.matchColor(54, 57, 63)); //discord colour   54, 57, 63
+        if (!(renderedGrid)) {
+            for (int x = 0; x < 128; x += 121) {
+                for (int y = 0; y < 128; y++) {
+                    for (int i = 0; i < 7; i++) {
+                        mapCanvas.setPixel(x + i, y, MapPalette.matchColor(54, 57, 63));
+                    }
                 }
             }
-        }
-        for (int y = 0; y < 128; y+= 121){
-            for (int x = 0; x < 128; x++) {
-                for (int i = 0; i < 7; i++){
-                    mapCanvas.setPixel(x, y+i, MapPalette.matchColor(54, 57, 63)); //discord colour   54, 57, 63
+            for (int y = 0; y < 128; y += 121) {
+                for (int x = 0; x < 128; x++) {
+                    for (int i = 0; i < 7; i++) {
+                        mapCanvas.setPixel(x, y + i, MapPalette.matchColor(54, 57, 63));
+                    }
                 }
             }
-        }
-        for (int x = 5; x < 128; x+= 23){
-            for (int y = 7; y < 121; y++) {
-                for (int i = 0; i < 3; i++){
-                    mapCanvas.setPixel(x+i, y, MapPalette.matchColor(54, 57, 63)); //discord colour   54, 57, 63
+            for (int x = 5; x < 128; x += 23) {
+                for (int y = 7; y < 121; y++) {
+                    for (int i = 0; i < 3; i++) {
+                        mapCanvas.setPixel(x + i, y, MapPalette.matchColor(54, 57, 63));
+                    }
                 }
             }
-        }
-        for (int y = 5; y < 128; y+= 23){
-            for (int x = 7; x < 121; x++) {
-                for (int i = 0; i < 3; i++){
-                    mapCanvas.setPixel(x, y+i, MapPalette.matchColor(54, 57, 63)); //discord colour   54, 57, 63
+            for (int y = 5; y < 128; y += 23) {
+                for (int x = 7; x < 121; x++) {
+                    for (int i = 0; i < 3; i++) {
+                        mapCanvas.setPixel(x, y + i, MapPalette.matchColor(54, 57, 63));
+                    }
                 }
             }
+            renderedGrid = true;
         }
 
-        for (BingoItem bingoItem : bingoItemsToDraw) {
-            for (int x = 0; x < 20; x++){
-                for (int y = 0; y < 20; y++){
-                    mapCanvas.setPixel(8+(bingoItem.getX()*23)+x, 8+(bingoItem.getY()*23)+y, bingoItem.getStatus().color);
+        for (BingoItem bingoItem : plugin.getPlayerBingoBuffer().get(player.getUniqueId())) {
+            for (int x = 0; x < 20; x++) {
+                for (int y = 0; y < 20; y++) {
+                    mapCanvas.setPixel(8 + bingoItem.getX() * 23 + x, 8 + bingoItem.getY() * 23 + y, bingoItem.getStatus().color);
                 }
             }
-            drawImageWithTransparency(mapCanvas, bingoItem.getItemImage(), 10+(bingoItem.getX()*23), 10+(bingoItem.getY()*23));
-            mapCanvas.drawText(10+8+(bingoItem.getX()*23), 10+8+(bingoItem.getY()*23), MinecraftFont.Font, ChatColor.WHITE + "§14" + String.valueOf(bingoItem.getPoints()) + "");
+
+            drawImageWithTransparency(mapCanvas, bingoItem.getItemImage(), 10 + bingoItem.getX() * 23, 10 + bingoItem.getY() * 23);
+
+            if (bingoItem.getStatus().equals(BingoItemStatus.UNCOLLECTED)) {
+                mapCanvas.drawText(16 + bingoItem.getX() * 23, 20 + bingoItem.getY() * 23, MinecraftFont.Font, "§34;" + String.valueOf(bingoItem.getPoints()) + "");
+            }
         }
-        bingoItemsToDraw.clear();
-    }
-
-    public void addText(String text) {
-        textsToDraw.add(text);
-    }
-
-    public void addImage(BufferedImage image) {
-        imagesToDraw.add(image);
-    }
-
-    public void addBingoItem(BingoItem bingoItem){
-        bingoItemsToDraw.add(bingoItem);
+        plugin.getPlayerBingoBuffer().get(player.getUniqueId()).clear();
     }
 
     private void drawImageWithTransparency(MapCanvas canvas, BufferedImage img, int x0, int y0) {
