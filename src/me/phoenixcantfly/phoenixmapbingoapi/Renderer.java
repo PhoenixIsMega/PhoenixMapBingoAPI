@@ -23,7 +23,7 @@ public class Renderer extends MapRenderer {
     }
 
     public void render(MapView mapView, MapCanvas mapCanvas, Player player) {
-        if (!(renderedGrid)) {
+        if (!(renderedGrid)) { //Should change to image, wait for artist to be free
             for (int x = 0; x < 128; x += 121) {
                 for (int y = 0; y < 128; y++) {
                     for (int i = 0; i < 7; i++) {
